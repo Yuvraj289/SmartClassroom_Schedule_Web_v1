@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EduSchedule — Smart Classroom Scheduler</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- SIDEBAR NAV -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-mark">ES</div>
+        <div>
+          <div class="logo-title">EduSchedule</div>
+          <div class="logo-sub">Smart Scheduler</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-page="dashboard"
+          ><span class="nav-icon">⊞</span> Dashboard</a
+        >
+        <a href="#" class="nav-item" data-page="schedule"
+          ><span class="nav-icon">📅</span> Schedule Class</a
+        >
+        <a href="#" class="nav-item" data-page="timetable"
+          ><span class="nav-icon">🗓</span> Timetable</a
+        >
+        <a href="#" class="nav-item" data-page="teachers"
+          ><span class="nav-icon">👨‍🏫</span> Teachers</a
+        >
+        <a href="#" class="nav-item" data-page="rooms"
+          ><span class="nav-icon">🏛</span> Rooms</a
+        >
+        <a href="#" class="nav-item" data-page="notifications"
+          ><span class="nav-icon">🔔</span> Notifications
+          <span class="badge" id="notif-badge">0</span></a
+        >
+      </nav>
+      <div class="sidebar-footer">
+        <div class="footer-text">College Mini Project</div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main" id="main">
+      <!-- TOP BAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-btn" id="menuBtn">☰</button>
+          <div class="page-title" id="pageTitle">Dashboard</div>
+        </div>
+        <div class="topbar-right">
+          <div class="clock" id="clock">--:--:--</div>
+          <div class="avatar">AD</div>
+        </div>
+      </header>
+
+      <!-- NOTIFICATION TOAST CONTAINER -->
+      <div class="toast-container" id="toastContainer"></div>
+
+      <!-- ─── DASHBOARD PAGE ─── -->
+      <section class="page active" id="page-dashboard">
+        <div class="stat-grid">
+          <div class="stat-card accent-blue">
+            <div class="stat-icon">📅</div>
+            <div class="stat-val" id="stat-classes">0</div>
+            <div class="stat-label">Total Classes</div>
+          </div>
+          <div class="stat-card accent-green">
+            <div class="stat-icon">👨‍🏫</div>
+            <div class="stat-val" id="stat-teachers">0</div>
+            <div class="stat-label">Teachers</div>
+          </div>
+          <div class="stat-card accent-yellow">
+            <div class="stat-icon">🏛</div>
+            <div class="stat-val" id="stat-rooms">0</div>
+            <div class="stat-label">Rooms Available</div>
+          </div>
+          <div class="stat-card accent-red">
+            <div class="stat-icon">⚡</div>
+            <div class="stat-val" id="stat-today">0</div>
+            <div class="stat-label">Today's Classes</div>
+          </div>
+        </div>
+
+        <!-- Today's Schedule -->
+        <div class="section-header">
+          <h2>Today's Schedule</h2>
+          <span class="section-sub" id="today-date"></span>
+        </div>
+        <div class="today-timeline" id="todayTimeline">
+          <div class="empty-state">No classes scheduled for today.</div>
+        </div>
+
+        <!-- Upcoming Reminders -->
+        <div class="section-header">
+          <h2>Upcoming Reminders</h2>
+        </div>
+        <div class="reminder-list" id="reminderList">
+          <div class="empty-state">No upcoming reminders.</div>
+        </div>
+      </section>
+
+      <!-- ─── SCHEDULE PAGE ─── -->
+      <section class="page" id="page-schedule">
+        <div class="form-card">
+          <h2 class="form-title">Schedule a New Class</h2>
+          <p class="form-desc">
+            Fill in the details. The system will auto-detect clashes for
+            teachers and rooms.
+          </p>
+          <form id="scheduleForm" autocomplete="off">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Subject / Course</label>
+                <input
+                  type="text"
+                  id="f-subject"
+                  placeholder="e.g. Data Structures"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Department</label>
+                <input
+                  type="text"
+                  id="f-dept"
+                  placeholder="e.g. Computer Science"
+                />
+              </div>
+              <div class="form-group">
+                <label>Teacher</label>
+                <select id="f-teacher" required>
+                  <option value="">— Select Teacher —</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Room</label>
+                <select id="f-room" required>
+                  <option value="">— Select Room —</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="f-date" required />
+              </div>
+              <div class="form-group">
+                <label>Start Time</label>
+                <input type="time" id="f-start" required />
+              </div>
+              <div class="form-group">
+                <label>End Time</label>
+                <input type="time" id="f-end" required />
+              </div>
+              <div class="form-group">
+                <label>Recurrence</label>
+                <select id="f-recur">
+                  <option value="none">Once</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="daily">Daily</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Clash Detection Display -->
+            <div class="clash-box" id="clashBox" style="display: none"></div>
+
+            <div class="form-actions">
+              <button type="button" class="btn-check" id="checkClashBtn">
+                🔍 Check Clashes
+              </button>
+              <button type="submit" class="btn-submit" id="submitBtn">
+                ✅ Schedule Class
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ─── TIMETABLE PAGE ─── -->
+      <section class="page" id="page-timetable">
+        <div class="timetable-controls">
+          <div class="week-nav">
+            <button class="week-btn" id="prevWeek">‹</button>
+            <span id="weekLabel">Week</span>
+            <button class="week-btn" id="nextWeek">›</button>
+          </div>
+          <div class="filter-group">
+            <select id="tt-teacher-filter">
+              <option value="">All Teachers</option>
+            </select>
+            <select id="tt-room-filter">
+              <option value="">All Rooms</option>
+            </select>
+            <button class="btn-export" id="exportBtn">⬇ Export CSV</button>
+          </div>
+        </div>
+        <div class="timetable-wrap">
+          <table class="timetable" id="timetable">
+            <thead id="ttHead"></thead>
+            <tbody id="ttBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ─── TEACHERS PAGE ─── -->
+      <section class="page" id="page-teachers">
+        <div class="two-col">
+          <div class="form-card compact">
+            <h2 class="form-title">Add Teacher</h2>
+            <form id="teacherForm">
+              <div class="form-group">
+                <label>Full Name</label>
+                <input
+                  type="text"
+                  id="t-name"
+                  placeholder="Prof. Name"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Subject(s)</label>
+                <input type="text" id="t-subject" placeholder="Math, Physics" />
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input
+                  type="email"
+                  id="t-email"
+                  placeholder="teacher@college.edu"
+                />
+              </div>
+              <button type="submit" class="btn-submit full">Add Teacher</button>
+            </form>
+          </div>
+          <div>
+            <div class="section-header"><h2>All Teachers</h2></div>
+            <div class="card-list" id="teacherList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── ROOMS PAGE ─── -->
+      <section class="page" id="page-rooms">
+        <div class="two-col">
+          <div class="form-card compact">
+            <h2 class="form-title">Add Room</h2>
+            <form id="roomForm">
+              <div class="form-group">
+                <label>Room Name / Number</label>
+                <input
+                  type="text"
+                  id="r-name"
+                  placeholder="e.g. Room 101"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Capacity</label>
+                <input
+                  type="number"
+                  id="r-capacity"
+                  placeholder="e.g. 60"
+                  min="1"
+                />
+              </div>
+              <div class="form-group">
+                <label>Type</label>
+                <select id="r-type">
+                  <option>Classroom</option>
+                  <option>Lab</option>
+                  <option>Seminar Hall</option>
+                  <option>Auditorium</option>
+                </select>
+              </div>
+              <button type="submit" class="btn-submit full">Add Room</button>
+            </form>
+          </div>
+          <div>
+            <div class="section-header"><h2>All Rooms</h2></div>
+            <div class="card-list" id="roomList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── NOTIFICATIONS PAGE ─── -->
+      <section class="page" id="page-notifications">
+        <div class="section-header">
+          <h2>Notification Center</h2>
+          <button class="btn-clear" id="clearNotifs">Clear All</button>
+        </div>
+        <div class="notif-list" id="notifList">
+          <div class="empty-state">No notifications yet.</div>
+        </div>
+      </section>
+    </main>
+
+    <!-- CLASS DETAIL MODAL -->
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal">
+        <button class="modal-close" id="modalClose">✕</button>
+        <div class="modal-body" id="modalBody"></div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
